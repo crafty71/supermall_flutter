@@ -12,7 +12,7 @@ class ProductInfoPage extends StatefulWidget {
 
   @override
   _ProductInfoPageState createState() =>
-      _ProductInfoPageState(arguments: this.arguments);
+      _ProductInfoPageState(arguments: arguments);
 }
 
 class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProviderStateMixin  {
@@ -29,8 +29,8 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
   String highNowPrice = '';
   String discountDesc = '';
   List columns = [];
-  List Services = [];
-  List ShopInfo = [];
+  List services = [];
+  List shopInfo = [];
   String shopLogo = '';
   String shopName = '';
   String cSells = '';
@@ -39,9 +39,8 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
   List detailImage = [];
   List itemParamsRule = [];
   List itemParamsSet = [];
-  List RateList = [];
+  List rateList = [];
   List<ProductInfoRecommendEntity> goodItem = [];
-  int _currentIndex = 0;
   late TabController _tabController;
 
   _ProductInfoPageState({required this.arguments});
@@ -64,10 +63,10 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
   @override
   void initState() {
     super.initState();
-    _tabController = new TabController(length: 4, vsync: this);
-    _tabController.addListener(() {
-      print(_tabController.index);
-    });
+    _tabController = TabController(length: 4, vsync: this);
+    // _tabController.addListener(() {
+    //   print(_tabController.index);
+    // });
     _scrollController.addListener((){
       if( _scrollController.offset < 6564) {
         _tabController.animateTo(0);
@@ -89,7 +88,7 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
           setState(() {
             itemInfo.add(item.itemInfo);
             columns.addAll(item.columns);
-            Services.addAll(item.shopInfo.services);
+            services.addAll(item.shopInfo.services);
             shopLogo = item.shopInfo.shopLogo;
             shopName = item.shopInfo.name;
             cSells = "${item.shopInfo.cSells}";
@@ -97,7 +96,7 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
             score.addAll(item.shopInfo.score);
             itemParamsRule.addAll(item.itemParams.rule.tables[0]);
             itemParamsSet.add(item.itemParams.info.xSet);
-            RateList.addAll(item.rate.list);
+            rateList.addAll(item.rate.list);
 
             for (var item in item.detailInfo.detailImage) {
               detailImage.addAll(item.list);
@@ -133,8 +132,8 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
     }).toList();
   }
 
-  List<Widget> _Services() {
-    return Services.map((value) {
+  List<Widget> _services() {
+    return services.map((value) {
       return Wrap(
         children: [
           // Image.network("http:${value.icon}", width: 14, height: 14, ),
@@ -182,24 +181,24 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
     }).toList();
   }
 
-  List<Widget> _Product() {
+  List<Widget> _product() {
     return detailImage.map((item) {
       return Container(
           padding: const EdgeInsets.only(bottom: 10),
           child: Image.network(
-            "http:${item}",
+            "http:$item",
           ));
     }).toList();
   }
 
 // .toList().cast<Widget>() 很关键
-  List<Widget> _TableSell(item) {
+  List<Widget> _tableSell(item) {
     return item
         .map((value) {
           return Container(
             padding: const EdgeInsets.only(top: 10, bottom: 10),
             child: Text(
-              "${value}",
+              "$value",
               textAlign: TextAlign.center,
             ),
           );
@@ -208,18 +207,17 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
         .cast<Widget>();
   }
 
-  List<TableRow> _TableRow() {
+  List<TableRow> _tableRow() {
     return itemParamsRule
         .map((item) {
-          return TableRow(children: _TableSell(item));
+          return TableRow(children: _tableSell(item));
         })
         .toList()
         .cast<TableRow>();
   }
 
-  Widget _Tabbar() {
+  Widget _tabbar() {
     return DefaultTabController(
-      initialIndex: _currentIndex,
       length: 4,
       child: Scaffold(
         appBar: AppBar(
@@ -239,7 +237,6 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
               } else if (index ==3) {
                 _scrollposition(7535);
               }
-              index == _currentIndex;
             },
             tabs: const [
               Tab(
@@ -328,7 +325,7 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
                   border: Border.all(width: 1, color: Colors.red),
                 ),
                 child: Text(
-                  "$discountDesc",
+                  discountDesc,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -351,7 +348,7 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
           padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
           child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: _Services()),
+              children: _services()),
         ),
         const Divider(
           height: 16,
@@ -453,7 +450,7 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
   }
 
   Widget _productShow() {
-    return Wrap(children: _Product());
+    return Wrap(children: _product());
   }
 
   Widget _shopInformation() {
@@ -462,7 +459,7 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
           horizontalInside: BorderSide(color: Colors.black12),
           // verticalInside: BorderSide(color: Colors.red),
         ),
-        children: _TableRow());
+        children: _tableRow());
   }
 
   List<Wrap> _itemParamsSet() {
@@ -506,7 +503,7 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
         .cast<Widget>();
   }
 
-  List<Widget> _UserRate() {
+  List<Widget> _userRate() {
     return [
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -528,14 +525,14 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
       Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
-          children: _UserRateInformation(),
+          children: _userRateInformation(),
         ),
       )
     ];
   }
 
-  List<Widget> _UserRateInformation() {
-    return RateList.map((item) {
+  List<Widget> _userRateInformation() {
+    return rateList.map((item) {
       return Column(children: [
         Row(
           children: [
@@ -653,7 +650,7 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
           actions: <Widget>[
             SizedBox(
               width: 330,
-              child: _Tabbar(),
+              child: _tabbar(),
             )
           ],
           backgroundColor: Colors.pink,
@@ -723,11 +720,11 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: _UserRate(),
+              children: _userRate(),
             ),
             Container(
-              padding: EdgeInsets.fromLTRB(10, 20, 0, 20),
-              child: Text("为您推荐", style: TextStyle(
+              padding: const EdgeInsets.fromLTRB(10, 20, 0, 20),
+              child: const Text("为您推荐", style: TextStyle(
                 fontSize: 22
               ),),
             ),
