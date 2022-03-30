@@ -394,6 +394,10 @@ class ProductInfoResultRate {
 
   Map<String, dynamic> toJson() => $ProductInfoResultRateToJson(this);
 
+	@override
+  String toString() {
+    return 'ProductInfoResultRate{list: $list, cRate: $cRate}';
+  }
 }
 
 @JsonSerializable()
@@ -415,6 +419,10 @@ class ProductInfoResultRateList {
 
   Map<String, dynamic> toJson() => $ProductInfoResultRateListToJson(this);
 
+	@override
+  String toString() {
+    return 'ProductInfoResultRateList{user: $user, rateId: $rateId, content: $content, created: $created, isAnonymous: $isAnonymous, style: $style, isEmpty: $isEmpty, level: $level, canExplain: $canExplain}';
+  }
 }
 
 @JsonSerializable()
@@ -432,4 +440,8 @@ class ProductInfoResultRateListUser {
 
   Map<String, dynamic> toJson() => $ProductInfoResultRateListUserToJson(this);
 
+	@override
+  String toString() {
+    return 'ProductInfoResultRateListUser{uid: $uid, uname: $uname, avatar: $avatar, profileUrl: $profileUrl, tagIndex: $tagIndex}';
+  }
 }

@@ -9,6 +9,8 @@ import 'package:supermall/model/good_list_item_entity.dart';
 import 'package:supermall/generated/json/good_list_item_entity.g.dart';
 import 'package:supermall/model/product_info_entity.dart';
 import 'package:supermall/generated/json/product_info_entity.g.dart';
+import 'package:supermall/model/product_info_recommend_entity.dart';
+import 'package:supermall/generated/json/product_info_recommend_entity.g.dart';
 import 'package:supermall/model/recommend_item_entity.dart';
 import 'package:supermall/generated/json/recommend_item_entity.g.dart';
 
@@ -171,6 +173,9 @@ class JsonConvert {
 		if(type == (ProductInfoResultRateListUser).toString()){
 			return ProductInfoResultRateListUser.fromJson(json) as M;
 		}
+		if(type == (ProductInfoRecommendEntity).toString()){
+			return ProductInfoRecommendEntity.fromJson(json) as M;
+		}
 		if(type == (RecommendItemEntity).toString()){
 			return RecommendItemEntity.fromJson(json) as M;
 		}
@@ -274,6 +279,9 @@ class JsonConvert {
 		}
 		if(<ProductInfoResultRateListUser>[] is M){
 			return data.map<ProductInfoResultRateListUser>((Map<String, dynamic> e) => ProductInfoResultRateListUser.fromJson(e)).toList() as M;
+		}
+		if(<ProductInfoRecommendEntity>[] is M){
+			return data.map<ProductInfoRecommendEntity>((Map<String, dynamic> e) => ProductInfoRecommendEntity.fromJson(e)).toList() as M;
 		}
 		if(<RecommendItemEntity>[] is M){
 			return data.map<RecommendItemEntity>((Map<String, dynamic> e) => RecommendItemEntity.fromJson(e)).toList() as M;

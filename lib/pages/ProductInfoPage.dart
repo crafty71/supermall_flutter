@@ -1,8 +1,10 @@
 import 'package:card_swiper/card_swiper.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:supermall/model/product_info_entity.dart';
+import 'package:supermall/model/product_info_recommend_entity.dart';
 import 'package:supermall/service/product_info_request.dart';
+import 'package:supermall/utils/ScreenAdapter.dart';
 
 class ProductInfoPage extends StatefulWidget {
   final Map arguments;
@@ -13,7 +15,8 @@ class ProductInfoPage extends StatefulWidget {
       _ProductInfoPageState(arguments: this.arguments);
 }
 
-class _ProductInfoPageState extends State<ProductInfoPage> {
+class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProviderStateMixin  {
+  final ScrollController _scrollController = ScrollController();
   Map arguments;
   final List<ProductInfoResult> productInfo = [];
   List<ProductInfoResultItemInfo> itemInfo = [];
@@ -37,12 +40,45 @@ class _ProductInfoPageState extends State<ProductInfoPage> {
   List itemParamsRule = [];
   List itemParamsSet = [];
   List RateList = [];
+  List<ProductInfoRecommendEntity> goodItem = [];
+  int _currentIndex = 0;
+  late TabController _tabController;
 
   _ProductInfoPageState({required this.arguments});
+
+
+  void _scrollToend() {
+
+    _scrollController.animateTo(0,
+        duration: const Duration(milliseconds: 1000), curve: Curves.linear);
+  }
+
+  void _scrollposition(double location){
+    _scrollController.animateTo(location,
+        duration: const Duration(milliseconds: 2000), curve: Curves.linear);
+
+  }
+
+
 
   @override
   void initState() {
     super.initState();
+    _tabController = new TabController(length: 4, vsync: this);
+    _tabController.addListener(() {
+      print(_tabController.index);
+    });
+    _scrollController.addListener((){
+      if( _scrollController.offset < 6564) {
+        _tabController.animateTo(0);
+      }else if ( 6564 < _scrollController.offset && _scrollController.offset < 7334 ){
+        _tabController.animateTo(1);
+      } else if ( 7334 < _scrollController.offset && _scrollController.offset < 7534 ){
+        _tabController.animateTo(2);
+      } else if(7334 < _scrollController.offset) {
+        _tabController.animateTo(3);
+      }
+    });
     setState(() {
       iid = arguments["pid"];
     });
@@ -60,9 +96,8 @@ class _ProductInfoPageState extends State<ProductInfoPage> {
             cGoods = "${item.shopInfo.cGoods}";
             score.addAll(item.shopInfo.score);
             itemParamsRule.addAll(item.itemParams.rule.tables[0]);
-            itemParamsSet.addAll(item.itemParams.info.xSet);
+            itemParamsSet.add(item.itemParams.info.xSet);
             RateList.addAll(item.rate.list);
-            print(itemParamsSet);
 
             for (var item in item.detailInfo.detailImage) {
               detailImage.addAll(item.list);
@@ -80,6 +115,11 @@ class _ProductInfoPageState extends State<ProductInfoPage> {
             discountDesc = item.discountDesc;
           });
         }
+      });
+    });
+    prodoctInfoRequest.requestProductRecommend().then((value){
+      setState(() {
+        goodItem.addAll(value);
       });
     });
   }
@@ -151,39 +191,56 @@ class _ProductInfoPageState extends State<ProductInfoPage> {
           ));
     }).toList();
   }
+
 // .toList().cast<Widget>() 很关键
   List<Widget> _TableSell(item) {
-    return item.map((value) {
-      print(item);
-      return Container(
-        padding: const EdgeInsets.only(top: 10, bottom: 10),
-        child: Text(
-          "${value}",
-          textAlign: TextAlign.center,
-        ),
-      );
-    }).toList().cast<Widget>();
+    return item
+        .map((value) {
+          return Container(
+            padding: const EdgeInsets.only(top: 10, bottom: 10),
+            child: Text(
+              "${value}",
+              textAlign: TextAlign.center,
+            ),
+          );
+        })
+        .toList()
+        .cast<Widget>();
   }
 
   List<TableRow> _TableRow() {
-    return itemParamsRule.map((item){
-      return TableRow(
-        children: _TableSell(item)
-      );
-    }).toList().cast<TableRow>();
+    return itemParamsRule
+        .map((item) {
+          return TableRow(children: _TableSell(item));
+        })
+        .toList()
+        .cast<TableRow>();
   }
 
   Widget _Tabbar() {
     return DefaultTabController(
+      initialIndex: _currentIndex,
       length: 4,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.pink,
           bottom: TabBar(
+            controller: _tabController,
             unselectedLabelColor: Colors.black,
-            indicatorColor: Colors.pinkAccent,
-            labelColor: Colors.pinkAccent,
-            onTap: (index) {},
+            indicatorColor: Colors.pink,
+            labelColor: Colors.white,
+            onTap: (index) {
+              if(index == 0) {
+                _scrollToend();
+              } else if(index ==1 ) {
+                _scrollposition(6565);
+              } else if (index == 2) {
+                _scrollposition(7335);
+              } else if (index ==3) {
+                _scrollposition(7535);
+              }
+              index == _currentIndex;
+            },
             tabs: const [
               Tab(
                 text: "商品",
@@ -313,6 +370,7 @@ class _ProductInfoPageState extends State<ProductInfoPage> {
           Padding(
             padding: const EdgeInsets.only(left: 10),
             child: SizedBox(
+              height: 50,
               child: Row(
                 children: [
                   Image.network(
@@ -398,9 +456,9 @@ class _ProductInfoPageState extends State<ProductInfoPage> {
     return Wrap(children: _Product());
   }
 
-  Widget _shopImformation() {
+  Widget _shopInformation() {
     return Table(
-        border: TableBorder(
+        border: const TableBorder(
           horizontalInside: BorderSide(color: Colors.black12),
           // verticalInside: BorderSide(color: Colors.red),
         ),
@@ -408,44 +466,211 @@ class _ProductInfoPageState extends State<ProductInfoPage> {
   }
 
   List<Wrap> _itemParamsSet() {
-    return itemParamsSet.map((item){
-      print(item);
-      return Wrap(
-        children: _itemParamsSetValue(item)
-      );
+    return itemParamsSet.map((item) {
+      return Wrap(children: _itemParamsSetValue(item));
     }).toList();
   }
 
   List<Widget> _itemParamsSetValue(item) {
-    return item.map((value){
-       return Padding(
-         padding: const EdgeInsets.all(8.0),
-         child: Row(
-           children: [
-             Text(value.key),
-             const SizedBox(
-               width: 20,
-             ),
-             Text(value.value),
-           ],
-         ),
-       );
-    }).toList().cast<Widget>();
+    return item
+        .map((value) {
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Text(value.key),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    LimitedBox(
+                      maxWidth: 300,
+                      child: Text(
+                        value.value,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(
+                height: 2,
+                thickness: 1,
+              ),
+            ],
+          );
+        })
+        .toList()
+        .cast<Widget>();
+  }
+
+  List<Widget> _UserRate() {
+    return [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(left: 10),
+            child: Text("用户评价"),
+          ),
+          TextButton(
+            onPressed: () {},
+            child: const Text("更多"),
+          )
+        ],
+      ),
+      const Divider(
+        height: 2,
+        thickness: 2,
+      ),
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: _UserRateInformation(),
+        ),
+      )
+    ];
+  }
+
+  List<Widget> _UserRateInformation() {
+    return RateList.map((item) {
+      return Column(children: [
+        Row(
+          children: [
+            CircleAvatar(
+              backgroundImage: NetworkImage("http:${item.user.avatar}"),
+            ),
+            const SizedBox(
+              width: 20,
+            ),
+            Text("${item.user.uname}"),
+          ],
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+        Column(
+          children: [
+            Text("${item.content}"),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              children: [
+                Text(formatDate(DateTime(item.created),
+                    [mm, '-', dd, ' ', HH, ':', nn, ':', ss])),
+                const SizedBox(
+                  width: 20,
+                ),
+                Text("${item.style}"),
+              ],
+            )
+          ],
+        )
+      ]);
+    }).toList();
+  }
+
+  Widget _recProductListWidget() {
+    var itemWidth = (ScreenAdaper.getScreenWidth() - 40) / 4;
+    return Wrap(
+      runSpacing: 10,
+      spacing: 10,
+      children: goodItem.map((value) {
+        return GestureDetector(
+          // onTap: () async {
+          //   Navigator.pushNamed(context, '/productinfo',arguments: {
+          //     "pid":value.itemId
+          //   });
+          // },
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            width: itemWidth,
+            decoration: BoxDecoration(
+                border: Border.all(
+                    color: const Color.fromRGBO(233, 233, 233, 0.9), width: 1)),
+            child: Column(
+              children: <Widget>[
+                SizedBox(
+                  width: double.infinity,
+                  child: AspectRatio(
+                    //防止服务器返回的图片大小不一致导致高度不一致问题
+                    aspectRatio: 1 / 1,
+                    child: Image.network(
+                      value.image,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: ScreenAdaper.height(20)),
+                  child: Text(
+                    value.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.black54),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: ScreenAdaper.height(20)),
+                  child: Stack(
+                    children: <Widget>[
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "¥${value.discountPrice}",
+                          style: const TextStyle(color: Colors.red, fontSize: 16),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Text("¥${value.price}",
+                            style: const TextStyle(
+                                color: Colors.black54,
+                                fontSize: 14,
+                                decoration: TextDecoration.lineThrough)),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    ScreenAdaper.init(context);
     return Scaffold(
         appBar: AppBar(
-          title: const Text("详情"),
+          // title: const Text("详情"),
           centerTitle: true,
-          backgroundColor: Colors.pinkAccent,
-        ),
-        body: ListView(
-          children: [
+          actions: <Widget>[
             SizedBox(
-              height: 50,
+              width: 330,
               child: _Tabbar(),
+            )
+          ],
+          backgroundColor: Colors.pink,
+        ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.pink,
+          child: const Icon(Icons.upload_rounded),
+          onPressed: () {
+            _scrollToend();
+          },
+        ),
+
+        body: ListView(
+          controller: _scrollController,
+          children: [
+            const SizedBox(
+              height: 1,
             ),
             Container(
               child: _swiperWidget(),
@@ -477,20 +702,36 @@ class _ProductInfoPageState extends State<ProductInfoPage> {
               height: 20,
             ),
             Container(
-              padding: EdgeInsets.only(left: 10),
-              child: Text("参数信息"),
+              padding: const EdgeInsets.only(left: 10),
+              child: const Text("参数信息"),
             ),
             const SizedBox(
               height: 20,
             ),
             Container(
-              child: _shopImformation(),
+              child: _shopInformation(),
+            ),
+            Column(
+              children: _itemParamsSet(),
+            ),
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Divider(
+                height: 4,
+                thickness: 4,
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: _UserRate(),
             ),
             Container(
-              child: Column(
-                children: _itemParamsSet(),
-              ),
-            )
+              padding: EdgeInsets.fromLTRB(10, 20, 0, 20),
+              child: Text("为您推荐", style: TextStyle(
+                fontSize: 22
+              ),),
+            ),
+            _recProductListWidget()
           ],
         ));
   }
