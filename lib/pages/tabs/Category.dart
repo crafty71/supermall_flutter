@@ -11,7 +11,7 @@ class CategoryPage extends StatefulWidget {
   _CategoryPageState createState() => _CategoryPageState();
 }
 
-class _CategoryPageState extends State<CategoryPage> {
+class _CategoryPageState extends State<CategoryPage> with SingleTickerProviderStateMixin {
   int _selectIndex = 0;
   int maitKey = 3627;
   int miniWallkey = 10062603;
@@ -19,11 +19,23 @@ class _CategoryPageState extends State<CategoryPage> {
   List<CategoryListEntity> categorise = [];
   List<CategoryItemEntity> categoryItem = [];
   final List<CategoryDetailEntity> categoryDetail = [];
+  late TabController _tabController;
+  final ScrollController _scrollController = ScrollController();
+
+  void _scrollToend() {
+    _scrollController.animateTo(0,
+        duration: const Duration(milliseconds: 1000), curve: Curves.linear);
+  }
+
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    _tabController = TabController(
+        vsync: this,//固定写法
+        length: 3   //指定tab长度
+    );
     CategoryRequest.requestCategoryList().then((res) {
       setState(() {
         categorise.addAll(res);
@@ -41,6 +53,12 @@ class _CategoryPageState extends State<CategoryPage> {
     });
   }
 
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   Widget _leftViewList() {
     return ListView.builder(
       itemCount: categorise.length,
@@ -54,6 +72,10 @@ class _CategoryPageState extends State<CategoryPage> {
                   maitKey = int.parse(categorise[index].maitKey);
                   miniWallkey = int.parse(categorise[index].miniWallkey);
                   type = "pop";
+                  setState(() {
+                    _tabController.index = 0;
+                    _scrollToend();
+                  });
                 });
                 CategoryRequest.requestCategoryItem(maitKey)
                     .then((res) {
@@ -89,6 +111,7 @@ class _CategoryPageState extends State<CategoryPage> {
 
   Widget _rightView() {
     return CustomScrollView(
+      controller: _scrollController,
       slivers: [
         _rightViewList(),
         SliverToBoxAdapter(
@@ -112,6 +135,7 @@ class _CategoryPageState extends State<CategoryPage> {
         appBar: AppBar(
           backgroundColor: Colors.white,
           bottom: TabBar(
+            controller: _tabController,
             unselectedLabelColor: Colors.black,
             indicatorColor: Colors.pinkAccent,
             labelColor: Colors.pinkAccent,

@@ -36,7 +36,7 @@ class CategoryRequest {
 
   static Future requestCategoryDetail (int miniWallkey, String type) async {
     const url = "/subcategory/detail";
-    final params = {'miniWallkey': miniWallkey, 'type': "pop"};
+    final params = {'miniWallkey': miniWallkey, 'type': type};
     final result = await HttpRequest.request(url, params: params);
     final List<CategoryDetailEntity> categoryDetail = [];
     for(var item in result){
