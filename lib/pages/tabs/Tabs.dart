@@ -18,7 +18,7 @@ class _TabsState extends State<Tabs> {
 
   final List _pageList = [
     const HomePage(),
-    const CategoryPage(),
+    CategoryPage(),
     const CartPage(),
     const UserPage(),
   ];

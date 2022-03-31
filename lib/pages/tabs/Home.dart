@@ -7,7 +7,7 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:supermall/model/banner_item_entity.dart';
 import 'package:supermall/model/good_list_item_entity.dart';
 import 'package:supermall/service/home-request.dart';
-import 'package:supermall/utils/ScreenAdapter.dart';
+import 'package:supermall/utils/FitSize.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 
@@ -91,20 +91,20 @@ class _HomePage extends State<HomePage> {
 
 
   Widget _recProductListWidget() {
-    var itemWidth = (ScreenAdaper.getScreenWidth() - 60) / 4;
+    // var itemWidth = (ScreenAdaper.getScreenWidth() - ScreenAdaper.width(60)) / 3;
+    double itemWidth = SizeFit.setPx(172);
     return Wrap(
-      runSpacing: 10,
-      spacing: 10,
+      runSpacing: SizeFit.setPx(10),
+      spacing: SizeFit.setPx(10),
       children: goodItem.map((value) {
         return GestureDetector(
           onTap: () async {
-           print(value.iid);
            Navigator.pushNamed(context, '/productinfo',arguments: {
              "pid":value.iid
            });
           },
           child: Container(
-            padding: const EdgeInsets.all(10),
+            padding:  EdgeInsets.all(SizeFit.setPx(10)),
             width: itemWidth,
             decoration: BoxDecoration(
                 border: Border.all(
@@ -123,7 +123,7 @@ class _HomePage extends State<HomePage> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: ScreenAdaper.height(20)),
+                  padding: EdgeInsets.only(top: SizeFit.setPx(20)),
                   child: Text(
                     value.title,
                     maxLines: 2,
@@ -132,7 +132,7 @@ class _HomePage extends State<HomePage> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: ScreenAdaper.height(20)),
+                  padding: EdgeInsets.only(top: SizeFit.setPx(20)),
                   child: Stack(
                     children: <Widget>[
                       Align(
@@ -245,7 +245,7 @@ class _HomePage extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    ScreenAdaper.init(context);
+    SizeFit.initialize(context);
     // ignore: todo
     // TODO: implement build
     return Scaffold(
@@ -265,14 +265,14 @@ class _HomePage extends State<HomePage> {
         controller: _scrollController,
         children: [
           _swiperWidget(),
-          SizedBox(height: ScreenAdaper.height(20)),
+          SizedBox(height: SizeFit.setPx(20)),
           _Recommend(),
-          SizedBox(height: ScreenAdaper.height(20)),
+          SizedBox(height: SizeFit.setPx(20)),
           SizedBox(
-            height: 50,
+            height: SizeFit.setPx(50),
             child: _Tabbar(),
           ),
-          SizedBox(height: ScreenAdaper.height(20)),
+          SizedBox(height: SizeFit.setPx(20)),
           Container(
               padding: const EdgeInsets.all(10),
               child: Wrap(

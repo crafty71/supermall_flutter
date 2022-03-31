@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:supermall/model/product_info_entity.dart';
 import 'package:supermall/model/product_info_recommend_entity.dart';
 import 'package:supermall/service/product_info_request.dart';
-import 'package:supermall/utils/ScreenAdapter.dart';
+import 'package:supermall/utils/FitSize.dart';
+
 
 class ProductInfoPage extends StatefulWidget {
   final Map arguments;
@@ -15,7 +16,7 @@ class ProductInfoPage extends StatefulWidget {
       _ProductInfoPageState(arguments: arguments);
 }
 
-class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProviderStateMixin  {
+class _ProductInfoPageState extends State<ProductInfoPage>   {
   final ScrollController _scrollController = ScrollController();
   Map arguments;
   final List<ProductInfoResult> productInfo = [];
@@ -41,7 +42,7 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
   List itemParamsSet = [];
   List rateList = [];
   List<ProductInfoRecommendEntity> goodItem = [];
-  late TabController _tabController;
+
 
   _ProductInfoPageState({required this.arguments});
 
@@ -52,32 +53,12 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
         duration: const Duration(milliseconds: 1000), curve: Curves.linear);
   }
 
-  void _scrollposition(double location){
-    _scrollController.animateTo(location,
-        duration: const Duration(milliseconds: 2000), curve: Curves.linear);
-
-  }
 
 
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
-    // _tabController.addListener(() {
-    //   print(_tabController.index);
-    // });
-    _scrollController.addListener((){
-      if( _scrollController.offset < 6564) {
-        _tabController.animateTo(0);
-      }else if ( 6564 < _scrollController.offset && _scrollController.offset < 7334 ){
-        _tabController.animateTo(1);
-      } else if ( 7334 < _scrollController.offset && _scrollController.offset < 7534 ){
-        _tabController.animateTo(2);
-      } else if(7334 < _scrollController.offset) {
-        _tabController.animateTo(3);
-      }
-    });
     setState(() {
       iid = arguments["pid"];
     });
@@ -138,8 +119,8 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
         children: [
           // Image.network("http:${value.icon}", width: 14, height: 14, ),
           // Icon(Icons.volunteer_activism),
-          const SizedBox(
-            width: 5,
+          SizedBox(
+            width: SizeFit.setPx(5),
           ),
           Text(
             "${value.name}",
@@ -216,49 +197,9 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
         .cast<TableRow>();
   }
 
-  Widget _tabbar() {
-    return DefaultTabController(
-      length: 4,
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.pink,
-          bottom: TabBar(
-            controller: _tabController,
-            unselectedLabelColor: Colors.black,
-            indicatorColor: Colors.pink,
-            labelColor: Colors.white,
-            onTap: (index) {
-              if(index == 0) {
-                _scrollToend();
-              } else if(index ==1 ) {
-                _scrollposition(6565);
-              } else if (index == 2) {
-                _scrollposition(7335);
-              } else if (index ==3) {
-                _scrollposition(7535);
-              }
-            },
-            tabs: const [
-              Tab(
-                text: "商品",
-              ),
-              Tab(
-                text: "参数",
-              ),
-              Tab(
-                text: "评论",
-              ),
-              Tab(
-                text: "推荐",
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _swiperWidget() {
+    // height: 392
     return AspectRatio(
       aspectRatio: 1 / 1,
       child: Swiper(
@@ -370,10 +311,12 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
               height: 50,
               child: Row(
                 children: [
-                  Image.network(
-                    "http:$shopLogo",
-                    height: 20,
-                    width: 20,
+                  // Image.network(
+                  //   "http:$shopLogo",
+                  //   height: 20,
+                  // ),
+                  CircleAvatar(
+                    backgroundImage: NetworkImage("http:$shopLogo",),
                   ),
                   const SizedBox(
                     width: 10,
@@ -482,7 +425,7 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
                       width: 20,
                     ),
                     LimitedBox(
-                      maxWidth: 300,
+                      maxWidth: SizeFit.setPx(300),
                       child: Text(
                         value.value,
                         maxLines: 1,
@@ -571,10 +514,10 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
   }
 
   Widget _recProductListWidget() {
-    var itemWidth = (ScreenAdaper.getScreenWidth() - 40) / 4;
+    double itemWidth = SizeFit.setPx(182);
     return Wrap(
-      runSpacing: 10,
-      spacing: 10,
+      runSpacing: SizeFit.setPx(10),
+      spacing: SizeFit.setPx(10),
       children: goodItem.map((value) {
         return GestureDetector(
           // onTap: () async {
@@ -583,7 +526,7 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
           //   });
           // },
           child: Container(
-            padding: const EdgeInsets.all(10),
+            padding:  EdgeInsets.all(SizeFit.setPx(10)),
             width: itemWidth,
             decoration: BoxDecoration(
                 border: Border.all(
@@ -602,7 +545,7 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: ScreenAdaper.height(20)),
+                  padding: EdgeInsets.only(top: SizeFit.setPx(10)),
                   child: Text(
                     value.title,
                     maxLines: 2,
@@ -611,7 +554,7 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: ScreenAdaper.height(20)),
+                  padding: EdgeInsets.only(top: SizeFit.setPx(10)),
                   child: Stack(
                     children: <Widget>[
                       Align(
@@ -642,17 +585,11 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
-    ScreenAdaper.init(context);
+    SizeFit.initialize(context);
     return Scaffold(
         appBar: AppBar(
-          // title: const Text("详情"),
+          title: const Text("详情"),
           centerTitle: true,
-          actions: <Widget>[
-            SizedBox(
-              width: 330,
-              child: _tabbar(),
-            )
-          ],
           backgroundColor: Colors.pink,
         ),
         floatingActionButton: FloatingActionButton(
@@ -664,46 +601,47 @@ class _ProductInfoPageState extends State<ProductInfoPage> with SingleTickerProv
         ),
 
         body: ListView(
+          //  参数信息 393+1
           controller: _scrollController,
           children: [
             const SizedBox(
               height: 1,
-            ),
+            ), // 1
             Container(
               child: _swiperWidget(),
-            ),
-            Container(margin: const EdgeInsets.all(8), child: _priceWidget()),
+            ),// 393
+            Container(margin: const EdgeInsets.all(8), child: _priceWidget()),// 596
             Container(
               child: _shopWidget(),
-            ),
-            const Divider(
-              height: 16,
+            ),// 783
+            Divider(
+              height: SizeFit.setPx(16),
               thickness: 4,
             ),
             Column(
               children: [Text(productInfoTitle)],
             ),
-            const SizedBox(
-              height: 20,
+            SizedBox(
+              height: SizeFit.setPx(20),
             ),
             Column(
               children: const [Text("穿着效果")],
             ),
-            const SizedBox(
-              height: 20,
-            ),
+            SizedBox(
+              height: SizeFit.setPx(20),
+            ),// 895
             Container(
               child: _productShow(),
-            ),
-            const SizedBox(
-              height: 20,
+            ),// 535
+            SizedBox(
+              height: SizeFit.setPx(20),
             ),
             Container(
-              padding: const EdgeInsets.only(left: 10),
+              padding: EdgeInsets.only(left: SizeFit.setPx(10)),
               child: const Text("参数信息"),
             ),
-            const SizedBox(
-              height: 20,
+            SizedBox(
+              height: SizeFit.setPx(20),
             ),
             Container(
               child: _shopInformation(),

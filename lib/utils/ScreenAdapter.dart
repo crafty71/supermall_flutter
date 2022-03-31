@@ -9,7 +9,7 @@ class ScreenAdaper {
         BoxConstraints(
             maxWidth: MediaQuery.of(context).size.width,
             maxHeight: MediaQuery.of(context).size.height),
-        designSize: Size(750, 1334),
+        designSize: Size(270, 500),
         context: context,
         minTextAdapt: true,
         orientation: Orientation.portrait
